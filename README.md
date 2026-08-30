@@ -1,0 +1,2 @@
+# edumanager
+EduManager Educational Platform
