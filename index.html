@@ -3,118 +3,152 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EduManager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--b:#1467df;--bg:#f5f7fb;--card:#fff;--line:#e5eaf1;--txt:#172033;--muted:#788399;--g:#12a66a;--r:#e5484d;--o:#e9a21a}
-*{box-sizing:border-box}body{margin:0;background:#e8edf5;font-family:Arial,Tahoma,sans-serif;color:var(--txt)}
-.app{max-width:480px;margin:auto;min-height:100vh;background:var(--bg);padding-bottom:78px}
-.top{height:62px;background:var(--b);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:5}.top h2{font-size:18px;margin:0}.icon{font-size:21px}
-.page{padding:15px}.screen{display:none}.screen.on{display:block}.title{font-size:21px;font-weight:800}.muted{color:var(--muted);font-size:12px}.section{font-weight:800;font-size:14px;margin:15px 0 9px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:0 3px 14px #17203308}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat b{display:block;font-size:24px;margin-top:7px}.g{color:var(--g)}.r{color:var(--r)}.o{color:var(--o)}
-.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.primary{background:var(--b);color:#fff}.soft{background:#edf3ff;color:var(--b)}.danger{background:#ffe9ea;color:#c62f35}.full{width:100%}
-.row{display:flex;align-items:center;gap:9px}.grow{flex:1}.avatar{width:44px;height:44px;border-radius:50%;background:#eaf1ff;display:grid;place-items:center;color:var(--b);font-weight:800}
-.search,input,select{font:inherit}.search{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:0;margin:10px 0}
-.listrow{padding:12px 0;border-bottom:1px solid var(--line)}.listrow:last-child{border-bottom:0}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:20px;background:#e2f7ef;color:#11865a}.bad{background:#ffe8e9;color:#c52f35}.warn{background:#fff2d6;color:#a56d00}
-.kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f2f6;font-size:13px}.kv:last-child{border:0}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);height:70px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:8}.bottom button{border:0;background:#fff;color:#8791a3;font-size:11px}.bottom button.on{color:var(--b);font-weight:800}
-.modal{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:20}.modal.on{display:flex}.sheet{width:min(480px,100%);margin:auto;background:#fff;border-radius:20px 20px 0 0;padding:20px;max-height:90vh;overflow:auto}.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.field input,.field select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px}
-.toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:#172033;color:#fff;padding:11px 16px;border-radius:12px;display:none;z-index:30}
+*{box-sizing:border-box}body{margin:0;background:#eef2f7;font-family:Arial,Tahoma;color:#172033}
+.app{max-width:480px;margin:auto;min-height:100vh;background:#f7f9fc;padding-bottom:75px}
+.top{height:60px;background:#1467df;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.page{padding:16px}.screen{display:none}.screen.on{display:block}.card{background:white;border:1px solid #e3e8ef;border-radius:15px;padding:15px;margin-bottom:11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat b{font-size:25px;display:block;margin-top:8px}
+.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:bold;cursor:pointer}.primary{background:#1467df;color:#fff}
+.soft{background:#eaf1ff;color:#1467df}.danger{background:#ffe8e9;color:#c52f35}.full{width:100%}
+.row{display:flex;align-items:center;gap:10px}.grow{flex:1}.muted{font-size:12px;color:#7d8798}.title{font-size:21px;font-weight:800}
+input,select{font:inherit;width:100%;padding:11px;border:1px solid #dfe5ee;border-radius:10px;background:white;margin:7px 0}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);height:68px;background:white;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(4,1fr);z-index:5}
+.bottom button{border:0;background:white;color:#778195}.bottom .on{color:#1467df;font-weight:bold}
+.modal{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:10}.modal.on{display:flex}
+.sheet{width:min(480px,100%);margin:auto;background:white;border-radius:18px 18px 0 0;padding:18px;max-height:90vh;overflow:auto}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#172033;color:white;padding:10px 15px;border-radius:10px;display:none;z-index:20}
+label{font-size:12px;font-weight:bold}
 </style>
 </head>
 <body>
-<div id="login" style="min-height:100vh;display:grid;place-items:center;padding:20px">
+<div id="login" style="min-height:100vh;display:grid;place-items:center;padding:18px">
 <div class="card" style="width:min(430px,100%);padding:25px">
-<h1 style="text-align:center;color:var(--b);margin:0">🎓 EduManager</h1><p class="muted" style="text-align:center">نسخة قابلة للتعديل من الموبايل</p>
-<div class="field"><label>البريد الإلكتروني</label><input id="loginEmail" value="admin@example.com"></div>
-<div class="field"><label>كلمة المرور</label><input type="password" value="123456"></div>
-<button class="btn primary full" onclick="enter()">تسجيل الدخول</button>
+<h1 style="text-align:center;color:#1467df">🎓 EduManager</h1>
+<p class="muted" style="text-align:center">تسجيل دخول آمن</p>
+<label>البريد الإلكتروني</label><input id="email" type="email" autocomplete="email">
+<label>كلمة المرور</label><input id="password" type="password" autocomplete="current-password">
+<button class="btn primary full" onclick="login()">تسجيل الدخول</button>
+<button class="btn soft full" style="margin-top:8px" onclick="signup()">إنشاء حساب</button>
+<p id="loginMsg" class="muted"></p>
 </div></div>
 
 <div id="app" class="app" style="display:none">
-<header class="top"><span class="icon">☰</span><h2 id="topTitle">لوحة التحكم</h2><span>🔔</span></header>
+<header class="top"><b id="topTitle">Dashboard</b><button class="btn" style="background:#fff;color:#1467df" onclick="logout()">خروج</button></header>
 
 <section id="dashboard" class="screen on page">
-<div class="title">مرحباً بك 👋</div><div class="muted">إدارة المجموعات والطلاب والحضور من مكان واحد</div>
-<div class="grid" style="margin-top:14px">
-<div class="card stat">👥 الطلاب<b id="totalStudents">0</b></div><div class="card stat">👥 المجموعات<b id="totalGroups">0</b></div>
-<div class="card stat">🟢 حاضر<b class="g" id="presentCount">0</b></div><div class="card stat">🔴 غائب<b class="r" id="absentCount">0</b></div>
-</div>
-<div class="section">مجموعاتي</div><div id="dashGroups"></div>
+<div class="title">لوحة التحكم</div><p class="muted" id="userEmail"></p>
+<div class="grid"><div class="card stat">👥 الطلاب<b id="tc">0</b></div><div class="card stat">👥 المجموعات<b id="gc">0</b></div></div>
+<div id="dash"></div>
 </section>
 
 <section id="groups" class="screen page">
-<div class="row"><div class="grow"><div class="title">المجموعات</div><div class="muted">غيّر الاسم والبيانات بنفسك</div></div><button class="btn primary" onclick="openGroup()">+ مجموعة</button></div>
-<input id="groupSearch" class="search" placeholder="🔎 ابحث عن مجموعة" oninput="renderGroups()"><div id="groupsList"></div>
+<div class="row"><div class="grow"><div class="title">المجموعات</div></div><button class="btn primary" onclick="groupModal()">+ مجموعة</button></div>
+<input id="gq" placeholder="🔎 بحث" oninput="loadGroups()"><div id="groupsList"></div>
 </section>
 
 <section id="students" class="screen page">
-<div class="row"><div class="grow"><div class="title">الطلاب</div><div class="muted">إضافة وتعديل ونقل الطلاب</div></div><button class="btn primary" onclick="openStudent()">+ طالب</button></div>
-<input id="studentSearch" class="search" placeholder="🔎 ابحث بالاسم أو ID" oninput="renderStudents()"><div id="studentsList"></div>
+<div class="row"><div class="grow"><div class="title">الطلاب</div></div><button class="btn primary" onclick="studentModal()">+ طالب</button></div>
+<input id="sq" placeholder="🔎 بحث" oninput="loadStudents()"><div id="studentsList"></div>
 </section>
 
 <section id="attendance" class="screen page">
-<div class="row"><div class="grow"><div class="title">الحضور</div><div class="muted">الحالة تحفظ على هذا الجهاز</div></div><select id="attGroup" onchange="renderAttendance()"></select></div>
-<div class="card" style="margin-top:12px"><button class="btn soft" onclick="allPresent()">✓ الكل حاضر</button></div>
-<div id="attendanceList" class="card"></div><button class="btn primary full" onclick="saveAttendance()">💾 حفظ الحضور</button>
-</section>
-
-<section id="whatsapp" class="screen page">
-<div class="title">سجل WhatsApp</div><div class="muted">سجل تجريبي محلي للإشعارات</div><div id="waList" style="margin-top:12px"></div>
+<div class="title">الحضور</div><select id="ag" onchange="loadAttendance()"></select>
+<div id="attendanceList" class="card"></div><button class="btn primary full" onclick="saveAttendance()">حفظ الحضور</button>
 </section>
 
 <nav class="bottom">
-<button data-go="dashboard" class="on" onclick="go('dashboard')">⌂<br>الرئيسية</button>
+<button class="on" data-go="dashboard" onclick="go('dashboard')">⌂<br>الرئيسية</button>
 <button data-go="groups" onclick="go('groups')">👥<br>المجموعات</button>
 <button data-go="students" onclick="go('students')">👤<br>الطلاب</button>
 <button data-go="attendance" onclick="go('attendance')">✓<br>الحضور</button>
-<button data-go="whatsapp" onclick="go('whatsapp')">💬<br>WhatsApp</button>
 </nav></div>
 
-<div id="modal" class="modal"><div class="sheet"><h3 id="modalTitle"></h3><div id="modalBody"></div><div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" onclick="modalSave()">حفظ</button><button class="btn soft" onclick="closeModal()">إلغاء</button></div></div></div>
+<div id="modal" class="modal"><div class="sheet"><h3 id="mt"></h3><div id="mb"></div>
+<button class="btn primary full" onclick="saveModal()">حفظ</button></div></div>
 <div id="toast" class="toast"></div>
 
 <script>
-const KEY='edumanager_v05';
-let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
- groups:[
-  {id:'A',name:'Grade 10 – Group A',teacher:'أ. أحمد حسن',schedule:'الأحد - الثلاثاء - الخميس',time:'08:00 ص - 10:00 ص',room:'القاعة 12'},
-  {id:'B',name:'Grade 10 – Group B',teacher:'أ. محمد علي',schedule:'السبت - الإثنين - الأربعاء',time:'04:00 م - 06:00 م',room:'القاعة 8'},
-  {id:'C',name:'Grade 11 – Group A',teacher:'أ. علي محمود',schedule:'الأحد - الثلاثاء',time:'06:00 م - 08:00 م',room:'القاعة 4'}],
- students:[
-  {id:'1001',name:'Ahmed Mohamed',group:'A',parent:'Mr. Mohamed Said',wa:'+20 100 123 4567',email:'ahmed@example.com'},
-  {id:'1002',name:'Mohamed Ali',group:'A',parent:'Mr. Ali',wa:'+20 100 234 5678',email:'mohamed@example.com'},
-  {id:'1003',name:'Omar Hassan',group:'A',parent:'Mr. Hassan',wa:'+20 100 345 6789',email:'omar@example.com'},
-  {id:'1004',name:'Youssef Ahmed',group:'B',parent:'Mr. Ahmed',wa:'+20 100 456 7890',email:'youssef@example.com'},
-  {id:'1005',name:'Ali Mahmoud',group:'B',parent:'Mr. Mahmoud',wa:'+20 100 567 8901',email:'ali@example.com'},
-  {id:'1006',name:'Khaled Samir',group:'C',parent:'Mr. Samir',wa:'+20 100 678 9012',email:'khaled@example.com'}],
- attendance:{}, messages:[]
-};
-let modalKind=null, editId=null;
-function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
-function enter(){login.style.display='none';app.style.display='block';renderAll();toast('تم الدخول بنجاح')}
-function toast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2200)}
-function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');const titles={dashboard:'لوحة التحكم',groups:'المجموعات',students:'الطلاب',attendance:'الحضور',whatsapp:'سجل WhatsApp'};topTitle.textContent=titles[id];document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));if(id==='attendance')renderAttendance();if(id==='whatsapp')renderWA()}
-function groupName(id){return data.groups.find(g=>g.id===id)?.name||'بدون مجموعة'}
-function renderAll(){renderDashboard();renderGroups();renderStudents();renderAttendance();renderWA()}
-function renderDashboard(){totalStudents.textContent=data.students.length;totalGroups.textContent=data.groups.length;let vals=Object.values(data.attendance);presentCount.textContent=vals.filter(v=>v==='Present').length;absentCount.textContent=vals.filter(v=>v==='Absent').length;dashGroups.innerHTML=data.groups.map(g=>`<div class="card"><div class="row"><div class="avatar">👥</div><div class="grow"><b>${esc(g.name)}</b><div class="muted">${data.students.filter(s=>s.group===g.id).length} طالب • ${esc(g.schedule||'بدون جدول')}</div></div><button class="btn soft" onclick="viewGroup('${g.id}')">فتح</button></div></div>`).join('')||'<div class="card">لا توجد مجموعات</div>'}
-function renderGroups(){let q=(groupSearch?.value||'').toLowerCase();groupsList.innerHTML=data.groups.filter(g=>g.name.toLowerCase().includes(q)).map(g=>`<div class="card"><div class="row"><div class="avatar">👥</div><div class="grow"><b>${esc(g.name)}</b><div class="muted">${data.students.filter(s=>s.group===g.id).length} طالب</div></div></div><div class="kv"><span>المدرس</span><b>${esc(g.teacher||'-')}</b></div><div class="kv"><span>الجدول</span><b>${esc(g.schedule||'-')}</b></div><div class="kv"><span>الوقت</span><b>${esc(g.time||'-')}</b></div><div class="actions"><button class="btn soft" onclick="viewGroup('${g.id}')">تفاصيل</button><button class="btn primary" onclick="openGroup('${g.id}')">✏️ تعديل</button><button class="btn danger" onclick="deleteGroup('${g.id}')">حذف</button></div></div>`).join('')||'<div class="card">لا توجد نتائج</div>'}
-function viewGroup(id){const g=data.groups.find(x=>x.id===id);if(!g)return;const ss=data.students.filter(s=>s.group===id);modalKind='view';modalTitle.textContent='تفاصيل المجموعة';modalBody.innerHTML=`<div class="card"><div class="kv"><span>اسم المجموعة</span><b>${esc(g.name)}</b></div><div class="kv"><span>المدرس</span><b>${esc(g.teacher||'-')}</b></div><div class="kv"><span>الجدول</span><b>${esc(g.schedule||'-')}</b></div><div class="kv"><span>الوقت</span><b>${esc(g.time||'-')}</b></div><div class="kv"><span>القاعة</span><b>${esc(g.room||'-')}</b></div></div><div class="section">الطلاب (${ss.length})</div>${ss.map(s=>`<div class="listrow"><b>${esc(s.name)}</b><div class="muted">${esc(s.id)} • ${esc(s.wa||'بدون WhatsApp')}</div></div>`).join('')||'<div class="muted">لا يوجد طلاب</div>'}`;modal.querySelector('.primary').style.display='none';modal.classList.add('on')}
-function openGroup(id){modalKind='group';editId=id||null;const g=data.groups.find(x=>x.id===id)||{name:'',teacher:'',schedule:'',time:'',room:''};modalTitle.textContent=id?'تعديل المجموعة':'إضافة مجموعة';modalBody.innerHTML=`<div class="field"><label>اسم المجموعة</label><input id="fName" value="${escAttr(g.name)}"></div><div class="field"><label>المدرس</label><input id="fTeacher" value="${escAttr(g.teacher)}"></div><div class="field"><label>الجدول</label><input id="fSchedule" value="${escAttr(g.schedule)}"></div><div class="field"><label>الوقت</label><input id="fTime" value="${escAttr(g.time)}"></div><div class="field"><label>القاعة</label><input id="fRoom" value="${escAttr(g.room)}"></div>`;modal.querySelector('.primary').style.display='block';modal.classList.add('on')}
-function deleteGroup(id){if(data.students.some(s=>s.group===id)){toast('انقل الطلاب أولاً قبل حذف المجموعة');return}if(confirm('حذف المجموعة؟')){data.groups=data.groups.filter(g=>g.id!==id);persist();renderAll();toast('تم حذف المجموعة')}}
-function renderStudents(){let q=(studentSearch?.value||'').toLowerCase();studentsList.innerHTML=data.students.filter(s=>(s.name+' '+s.id).toLowerCase().includes(q)).map(s=>`<div class="card"><div class="row"><div class="avatar">${esc(s.name[0]||'؟')}</div><div class="grow"><b>${esc(s.name)}</b><div class="muted">ID: ${esc(s.id)} • ${esc(groupName(s.group))}</div></div></div><div class="kv"><span>ولي الأمر</span><b>${esc(s.parent||'-')}</b></div><div class="kv"><span>WhatsApp</span><b>${esc(s.wa||'-')}</b></div><div class="actions"><button class="btn primary" onclick="openStudent('${s.id}')">✏️ تعديل</button><button class="btn danger" onclick="deleteStudent('${s.id}')">حذف</button></div></div>`).join('')||'<div class="card">لا يوجد طلاب</div>'}
-function openStudent(id){modalKind='student';editId=id||null;const s=data.students.find(x=>x.id===id)||{id:'',name:'',group:data.groups[0]?.id||'',parent:'',wa:'',email:''};modalTitle.textContent=id?'تعديل الطالب':'إضافة طالب';modalBody.innerHTML=`<div class="field"><label>اسم الطالب</label><input id="sName" value="${escAttr(s.name)}"></div><div class="field"><label>Student ID</label><input id="sId" value="${escAttr(s.id)}" ${id?'readonly':''}></div><div class="field"><label>المجموعة</label><select id="sGroup">${data.groups.map(g=>`<option value="${g.id}" ${g.id===s.group?'selected':''}>${esc(g.name)}</option>`).join('')}</select></div><div class="field"><label>اسم ولي الأمر</label><input id="sParent" value="${escAttr(s.parent)}"></div><div class="field"><label>رقم WhatsApp</label><input id="sWa" value="${escAttr(s.wa)}"></div><div class="field"><label>البريد الإلكتروني</label><input id="sEmail" value="${escAttr(s.email)}"></div>`;modal.querySelector('.primary').style.display='block';modal.classList.add('on')}
-function deleteStudent(id){if(confirm('حذف الطالب؟')){data.students=data.students.filter(s=>s.id!==id);persist();renderAll();toast('تم حذف الطالب')}}
-function renderAttendance(){attGroup.innerHTML=data.groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');let gid=attGroup.value||data.groups[0]?.id;if(gid)attGroup.value=gid;const ss=data.students.filter(s=>s.group===gid);attendanceList.innerHTML=ss.map(s=>{let key=today()+'_'+s.id;let st=data.attendance[key]||'Present';return `<div class="listrow"><div class="row"><div class="grow"><b>${esc(s.name)}</b><div class="muted">${esc(s.id)}</div></div><button class="btn ${st==='Present'?'primary':'soft'}" onclick="setAtt('${s.id}','Present')">🟢 حاضر</button><button class="btn ${st==='Absent'?'danger':'soft'}" onclick="setAtt('${s.id}','Absent')">🔴 غائب</button></div></div>`}).join('')||'<div class="muted">لا يوجد طلاب في المجموعة</div>'}
-function setAtt(id,status){data.attendance[today()+'_'+id]=status;persist();renderAttendance()}
-function allPresent(){let gid=attGroup.value;data.students.filter(s=>s.group===gid).forEach(s=>data.attendance[today()+'_'+s.id]='Present');persist();renderAttendance();toast('تم تحديد الكل حاضر')}
-function saveAttendance(){persist();toast('تم حفظ الحضور')}
-function renderWA(){waList.innerHTML=data.messages.length?data.messages.map(m=>`<div class="card"><div class="row"><div class="grow"><b>${esc(m.student)}</b><div class="muted">${esc(m.time)}</div></div><span class="badge ${m.status==='Failed'?'bad':''}">${m.status}</span></div><div style="margin-top:9px;font-size:13px">${esc(m.text)}</div></div>`).join(''):'<div class="card"><div class="muted">لا توجد رسائل بعد. عند الغياب في النسخة الحقيقية سيتم إنشاء الرسائل وإرسالها عبر WhatsApp Business API.</div></div>'}
-function modalSave(){if(modalKind==='view'){closeModal();return}if(modalKind==='group'){let name=fName.value.trim();if(!name){toast('اكتب اسم المجموعة');return}if(editId){let g=data.groups.find(x=>x.id===editId);Object.assign(g,{name,teacher:fTeacher.value.trim(),schedule:fSchedule.value.trim(),time:fTime.value.trim(),room:fRoom.value.trim()})}else data.groups.push({id:'G'+Date.now(),name,teacher:fTeacher.value.trim(),schedule:fSchedule.value.trim(),time:fTime.value.trim(),room:fRoom.value.trim()});persist();closeModal();renderAll();toast('تم حفظ المجموعة')}else if(modalKind==='student'){let name=sName.value.trim(),id=sId.value.trim();if(!name||!id){toast('اكتب اسم الطالب وID');return}if(editId){let s=data.students.find(x=>x.id===editId);Object.assign(s,{name,group:sGroup.value,parent:sParent.value.trim(),wa:sWa.value.trim(),email:sEmail.value.trim()})}else{if(data.students.some(x=>x.id===id)){toast('Student ID موجود بالفعل');return}data.students.push({id,name,group:sGroup.value,parent:sParent.value.trim(),wa:sWa.value.trim(),email:sEmail.value.trim()})}persist();closeModal();renderAll();toast('تم حفظ بيانات الطالب')}}
-function closeModal(){modal.classList.remove('on');modalKind=null;modal.querySelector('.primary').style.display='block'}
-function today(){return new Date().toISOString().slice(0,10)}
+const URL='https://yklylebknbruozmmqoas.supabase.co';
+const KEY='sb_publishable_zwdxwTFXW3YPqIfmNaIKLg_buLdlyGy';
+const sb=window.supabase.createClient(URL,KEY);
+let kind=null,edit=null,cache={groups:[],students:[],att:{}};
+
 function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function escAttr(x){return esc(x)}
-modal.addEventListener('click',e=>{if(e.target===modal)closeModal()})
-</script>
-</body></html>
+function ea(x){return esc(x)}
+function toast(x){const t=document.getElementById('toast');t.textContent=x;t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
+function loginMsg(x){document.getElementById('loginMsg').textContent=x}
+
+async function login(){
+ loginMsg('جاري الدخول...');
+ const {error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:password.value});
+ if(error){loginMsg(error.message);return} await start();
+}
+async function signup(){
+ loginMsg('جاري إنشاء الحساب...');
+ const {data,error}=await sb.auth.signUp({email:email.value.trim(),password:password.value});
+ if(error){loginMsg(error.message);return}
+ loginMsg(data.session?'تم إنشاء الحساب':'تم إرسال رسالة تأكيد إلى بريدك الإلكتروني');
+}
+async function logout(){await sb.auth.signOut();app.style.display='none';login.style.display='grid'}
+async function start(){
+ const {data:{user}}=await sb.auth.getUser(); if(!user)return;
+ login.style.display='none';app.style.display='block';userEmail.textContent=user.email;
+ await ensureProfile(user); await loadAll();
+}
+async function ensureProfile(u){
+ let {data}=await sb.from('profiles').select('id,role').eq('id',u.id).maybeSingle();
+ if(!data) await sb.from('profiles').insert({id:u.id,full_name:u.email,role:'super_admin'});
+ else if(data.role!=='super_admin') toast('هذا الحساب ليس Super Admin');
+}
+async function loadAll(){await loadGroups();await loadStudents();await loadAttendance();tc.textContent=cache.students.length;gc.textContent=cache.groups.length;dash.innerHTML=cache.groups.map(g=>`<div class="card"><b>${esc(g.name)}</b><div class="muted">${cache.students.filter(s=>s.group_id===g.id).length} طالب</div></div>`).join('')}
+async function loadGroups(){
+ let {data,error}=await sb.from('groups').select('*').order('created_at');
+ if(error){toast(error.message);return} cache.groups=data||[];
+ let q=(gq.value||'').toLowerCase();
+ groupsList.innerHTML=cache.groups.filter(g=>g.name.toLowerCase().includes(q)).map(g=>`<div class="card"><b>${esc(g.name)}</b><p class="muted">${esc(g.schedule||'')}</p><button class="btn primary" onclick="groupModal('${g.id}')">✏️ تعديل</button> <button class="btn danger" onclick="delGroup('${g.id}')">حذف</button></div>`).join('');
+ ag.innerHTML=cache.groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+}
+async function loadStudents(){
+ let {data,error}=await sb.from('students').select('*').order('created_at');
+ if(error){toast(error.message);return} cache.students=data||[];let q=(sq.value||'').toLowerCase();
+ studentsList.innerHTML=cache.students.filter(s=>(s.name+' '+s.student_id).toLowerCase().includes(q)).map(s=>`<div class="card"><b>${esc(s.name)}</b><div class="muted">ID: ${esc(s.student_id)} • ${esc(cache.groups.find(g=>g.id===s.group_id)?.name||'بدون مجموعة')}</div><div>${esc(s.parent_name||'-')} • ${esc(s.parent_whatsapp||'-')}</div><br><button class="btn primary" onclick="studentModal('${s.id}')">✏️ تعديل</button> <button class="btn danger" onclick="delStudent('${s.id}')">حذف</button></div>`).join('');
+}
+function groupModal(id){
+ edit=id||null;kind='g';let g=cache.groups.find(x=>x.id===id)||{};mt.textContent=id?'تعديل المجموعة':'إضافة مجموعة';
+ mb.innerHTML=`<label>اسم المجموعة</label><input id="f1" value="${ea(g.name)}"><label>المدرس</label><input id="f2" value="${ea(g.teacher_id)}"><label>الجدول</label><input id="f3" value="${ea(g.schedule)}"><label>الوقت</label><input id="f4" value="${ea(g.time)}"><label>القاعة</label><input id="f5" value="${ea(g.room)}">`;modal.classList.add('on');
+}
+function studentModal(id){
+ edit=id||null;kind='s';let s=cache.students.find(x=>x.id===id)||{};mt.textContent=id?'تعديل الطالب':'إضافة طالب';
+ mb.innerHTML=`<label>اسم الطالب</label><input id="f1" value="${ea(s.name)}"><label>Student ID</label><input id="f2" value="${ea(s.student_id)}" ${id?'readonly':''}><label>المجموعة</label><select id="f3">${cache.groups.map(g=>`<option value="${g.id}" ${g.id===s.group_id?'selected':''}>${esc(g.name)}</option>`).join('')}</select><label>ولي الأمر</label><input id="f4" value="${ea(s.parent_name)}"><label>WhatsApp</label><input id="f5" value="${ea(s.parent_whatsapp)}"><label>Email</label><input id="f6" value="${ea(s.email)}">`;modal.classList.add('on');
+}
+async function saveModal(){
+ if(kind==='g'){
+  let o={name:f1.value.trim(),teacher_id:f2.value.trim()||null,schedule:f3.value.trim(),time:f4.value.trim(),room:f5.value.trim()};
+  let r=edit?await sb.from('groups').update(o).eq('id',edit):await sb.from('groups').insert(o);
+  if(r.error)toast(r.error.message);else{modal.classList.remove('on');await loadAll();toast('تم حفظ المجموعة')}
+ }else{
+  let o={name:f1.value.trim(),student_id:f2.value.trim(),group_id:f3.value,parent_name:f4.value.trim(),parent_whatsapp:f5.value.trim(),email:f6.value.trim()};
+  let r=edit?await sb.from('students').update(o).eq('id',edit):await sb.from('students').insert(o);
+  if(r.error)toast(r.error.message);else{modal.classList.remove('on');await loadAll();toast('تم حفظ الطالب')}
+ }
+}
+async function delGroup(id){if(!confirm('حذف المجموعة؟'))return;let r=await sb.from('groups').delete().eq('id',id);if(r.error)toast(r.error.message);else await loadAll()}
+async function delStudent(id){if(!confirm('حذف الطالب؟'))return;let r=await sb.from('students').delete().eq('id',id);if(r.error)toast(r.error.message);else await loadAll()}
+async function loadAttendance(){
+ if(!cache.groups.length)return;let gid=ag.value||cache.groups[0].id;ag.value=gid;
+ let {data}=await sb.from('attendance').select('*').eq('group_id',gid).eq('session_date',new Date().toISOString().slice(0,10));
+ cache.att={};(data||[]).forEach(a=>cache.att[a.student_id]=a.status);
+ attendanceList.innerHTML=cache.students.filter(s=>s.group_id===gid).map(s=>{let st=cache.att[s.id]||'present';return `<div style="padding:10px 0;border-bottom:1px solid #eee"><div class="row"><div class="grow"><b>${esc(s.name)}</b></div><button class="btn ${st==='present'?'primary':'soft'}" onclick="setA('${s.id}','present')">🟢</button><button class="btn ${st==='absent'?'danger':'soft'}" onclick="setA('${s.id}','absent')">🔴</button><button class="btn ${st==='late'?'primary':'soft'}" onclick="setA('${s.id}','late')">🟡</button></div></div>`}).join('');
+}
+function setA(id,s){cache.att[id]=s;loadAttendance()}
+async function saveAttendance(){
+ let gid=ag.value,date=new Date().toISOString().slice(0,10);
+ for(const s of cache.students.filter(x=>x.group_id===gid)) await sb.from('attendance').upsert({student_id:s.id,group_id:gid,session_date:date,status:cache.att[s.id]||'present'},{onConflict:'student_id,session_date'});
+ toast('تم حفظ الحضور Online');
+}
+function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));topTitle.textContent={dashboard:'Dashboard',groups:'Groups',students:'Students',attendance:'Attendance'}[id];if(id==='attendance')loadAttendance()}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')modal.classList.remove('on')});
+sb.auth.getSession().then(({data:{session}})=>{if(session)start()});
+</script></body></html>
