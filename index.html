@@ -86,10 +86,22 @@ async function login(){
  if(error){loginMsg(error.message);return} await start();
 }
 async function signup(){
+ const e=email.value.trim(), pw=password.value;
+ if(!e || !pw){loginMsg('اكتب البريد الإلكتروني وكلمة المرور أولاً');return}
+ if(pw.length<6){loginMsg('كلمة المرور يجب أن تكون 6 أحرف على الأقل');return}
  loginMsg('جاري إنشاء الحساب...');
- const {data,error}=await sb.auth.signUp({email:email.value.trim(),password:password.value});
- if(error){loginMsg(error.message);return}
- loginMsg(data.session?'تم إنشاء الحساب':'تم إرسال رسالة تأكيد إلى بريدك الإلكتروني');
+ try{
+   const request=sb.auth.signUp({
+     email:e,password:pw,
+     options:{emailRedirectTo:window.location.origin+window.location.pathname}
+   });
+   const result=await Promise.race([
+     request,
+     new Promise((_,reject)=>setTimeout(()=>reject(new Error('انتهت مهلة الاتصال. تأكد من الإنترنت ثم أعد المحاولة.')),20000))
+   ]);
+   if(result.error){loginMsg(result.error.message);return}
+   loginMsg(result.data.session?'تم إنشاء الحساب ويمكنك الدخول الآن':'تم إنشاء الحساب. راجع بريدك الإلكتروني لتأكيد الحساب ثم ارجع وسجل الدخول.');
+ }catch(err){loginMsg(err.message||'تعذر الاتصال بالخادم، أعد المحاولة');}
 }
 async function logout(){await sb.auth.signOut();app.style.display='none';login.style.display='grid'}
 async function start(){
